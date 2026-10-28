@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wordle Word Generator — Scott Hilsee</title>
+<meta name="description" content="Random 5-letter word generator for Wordle practice.">
+<style>
+  :root{
+    --bg: #0b0c0e;
+    --bg-raised: #131417;
+    --line: #23252a;
+    --text: #ece9e3;
+    --text-dim: #9a9a97;
+    --accent: #c9a24b;
+    --accent-dim: #8a7333;
+    --focus: #e8c874;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    min-height:100vh;
+    background:var(--bg);
+    color:var(--text);
+    font-family: "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    display:flex; flex-direction:column; align-items:center;
+    padding:56px 24px;
+  }
+  ::selection{ background:var(--accent-dim); color:#fff; }
+  a{ color:var(--accent); }
+  :focus-visible{ outline:2px solid var(--focus); outline-offset:3px; }
+
+  .backlink{
+    align-self:flex-start;
+    font-family:system-ui,-apple-system,sans-serif;
+    font-size:0.8rem; letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--text-dim); text-decoration:none; margin-bottom:48px;
+  }
+  .backlink:hover{ color:var(--accent); }
+
+  h1{
+    font-family:"Baskerville","Iowan Old Style",Georgia,serif;
+    font-weight:400; font-size:clamp(1.8rem,5vw,2.6rem);
+    margin:0 0 10px; text-align:center;
+  }
+  p.sub{ color:var(--text-dim); margin:0 0 48px; text-align:center; max-width:40ch; }
+
+  .tiles{ display:flex; gap:10px; margin-bottom:40px; }
+  .tile{
+    width:58px; height:58px;
+    border:2px solid var(--line);
+    background:var(--bg-raised);
+    display:flex; align-items:center; justify-content:center;
+    font-family:system-ui,-apple-system,sans-serif;
+    font-size:1.7rem; font-weight:700; letter-spacing:0.02em;
+    text-transform:uppercase;
+    color:var(--text);
+    border-radius:3px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .tile.filled{ border-color:var(--accent); }
+  @media (max-width:480px){
+    .tile{ width:46px; height:46px; font-size:1.35rem; }
+    .tiles{ gap:7px; }
+  }
+
+  .btn{
+    font-family:system-ui,-apple-system,sans-serif;
+    font-size:0.85rem; letter-spacing:0.05em; text-transform:uppercase;
+    padding:13px 30px; border-radius:2px; cursor:pointer;
+    border:1px solid var(--accent);
+    background:var(--accent); color:#141414;
+  }
+  .btn:hover{ background:var(--focus); }
+  .btn:active{ transform:translateY(1px); }
+
+  .actions{ display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
+  .btn-ghost{
+    background:none; color:var(--text); border:1px solid var(--line);
+  }
+  .btn-ghost:hover{ border-color:var(--accent); color:var(--accent); }
+
+  .toggles{ display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin-top:18px; }
+  .btn-toggle{
+    font-family:system-ui,-apple-system,sans-serif;
+    font-size:0.78rem; letter-spacing:0.05em; text-transform:uppercase;
+    padding:10px 20px; border-radius:20px; cursor:pointer;
+    background:none; color:var(--text-dim); border:1px solid var(--line);
+    display:flex; align-items:center; gap:8px;
+  }
+  .btn-toggle:hover{ border-color:var(--accent-dim); color:var(--text); }
+  .btn-toggle.active{
+    background:var(--accent); color:#141414; border-color:var(--accent);
+  }
+  .btn-toggle .dot{
+    width:7px; height:7px; border-radius:50%; background:var(--line); flex:none;
+  }
+  .btn-toggle.active .dot{ background:#141414; }
+
+  .meta{
+    margin-top:28px; font-family:system-ui,-apple-system,sans-serif;
+    font-size:0.82rem; color:var(--text-dim); text-align:center;
+    max-width:38ch;
+  }
+  .meta span{ color:var(--accent); }
+</style>
+</head>
+<body>
+
+<a href="/" class="backlink">&larr; Back to scotthilsee.com</a>
+
+<h1>Random Word Generator</h1>
+<p class="sub">"I don't think you, my friend, get to be an arbiter of what's weird." - my wife, to me</p>
+
+<div class="tiles" id="tiles" aria-live="polite">
+  <div class="tile" id="t0">&nbsp;</div>
+  <div class="tile" id="t1">&nbsp;</div>
+  <div class="tile" id="t2">&nbsp;</div>
+  <div class="tile" id="t3">&nbsp;</div>
+  <div class="tile" id="t4">&nbsp;</div>
+</div>
+
+<div class="actions">
+  <button class="btn" id="genBtn">Generate Word</button>
+  <button class="btn btn-ghost" id="copyBtn">Copy</button>
+</div>
+
+<div class="toggles">
+  <button class="btn-toggle" id="solutionsToggle" type="button" aria-pressed="false">
+    <span class="dot"></span> Solutions only
+  </button>
+  <button class="btn-toggle" id="noDupToggle" type="button" aria-pressed="false">
+    <span class="dot"></span> No duplicate letters
+  </button>
+</div>
+
+<p class="meta"><span id="count">0</span> words in the current pool.</p>
+
+<script src="words.js"></script>
+<script src="answers.js"></script>
+<script>
+  function hasNoDup(w){ return new Set(w.split('')).size === w.length; }
+
+  var WORDS_NODUP = WORDS.filter(hasNoDup);
+  var ANSWERS_NODUP = ANSWERS.filter(hasNoDup);
+
+  var solutionsOnly = false;
+  var noDup = false;
+
+  function currentPool(){
+    if(solutionsOnly && noDup) return ANSWERS_NODUP;
+    if(solutionsOnly) return ANSWERS;
+    if(noDup) return WORDS_NODUP;
+    return WORDS;
+  }
+
+  function updateCount(){
+    document.getElementById('count').textContent = currentPool().length.toLocaleString();
+  }
+
+  var tiles = [0,1,2,3,4].map(function(i){ return document.getElementById('t'+i); });
+  var lastWord = "";
+
+  function generate(){
+    var pool = currentPool();
+    var word = pool[Math.floor(Math.random() * pool.length)];
+    lastWord = word;
+    tiles.forEach(function(tile, i){
+      tile.textContent = word[i];
+      tile.classList.remove('filled');
+      void tile.offsetWidth; // restart animation
+      tile.classList.add('filled');
+    });
+  }
+
+  document.getElementById('genBtn').addEventListener('click', generate);
+
+  document.getElementById('copyBtn').addEventListener('click', function(){
+    if(!lastWord) return;
+    navigator.clipboard.writeText(lastWord).then(function(){
+      var btn = document.getElementById('copyBtn');
+      var original = btn.textContent;
+      btn.textContent = "Copied!";
+      setTimeout(function(){ btn.textContent = original; }, 1200);
+    });
+  });
+
+  function bindToggle(id, setter){
+    var btn = document.getElementById(id);
+    btn.addEventListener('click', function(){
+      var active = !btn.classList.contains('active');
+      btn.classList.toggle('active', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      setter(active);
+      updateCount();
+      generate();
+    });
+  }
+
+  bindToggle('solutionsToggle', function(v){ solutionsOnly = v; });
+  bindToggle('noDupToggle', function(v){ noDup = v; });
+
+  updateCount();
+  generate();
+</script>
+
+</body>
+</html>

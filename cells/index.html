@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cell Parts Study Aid — Scott Hilsee</title>
+<meta name="description" content="Learn the parts of animal and plant cells, then quiz yourself by labeling the diagram or finding each part.">
+<style>
+  :root{
+    --bg: #0b0c0e;
+    --bg-raised: #131417;
+    --line: #23252a;
+    --text: #ece9e3;
+    --text-dim: #9a9a97;
+    --accent: #c9a24b;
+    --accent-dim: #8a7333;
+    --focus: #e8c874;
+    --good: #8fdc8f;
+    --bad: #ff9a9a;
+    --sans: system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --display: "Baskerville","Iowan Old Style",Georgia,serif;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; min-height:100vh;
+    background:var(--bg); color:var(--text);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    line-height:1.55;
+    display:flex; flex-direction:column; align-items:center;
+    padding:40px 20px 70px;
+  }
+  ::selection{ background:var(--accent-dim); color:#fff; }
+  a{ color:var(--accent); }
+  :focus-visible{ outline:2px solid var(--focus); outline-offset:3px; }
+
+  .links{ align-self:flex-start; margin-bottom:32px; }
+  .backlink{
+    font-family:var(--sans); font-size:0.8rem; letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--text-dim); text-decoration:none;
+  }
+  .backlink:hover{ color:var(--accent); }
+
+  h1{
+    font-family:var(--display); font-weight:400;
+    font-size:clamp(1.6rem,4.5vw,2.3rem); margin:0 0 8px; text-align:center;
+  }
+  p.sub{ color:var(--text-dim); margin:0 0 26px; text-align:center; max-width:54ch; font-size:0.98rem; }
+
+  .controls{ display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-bottom:22px; }
+  .seg{ display:inline-flex; border:1px solid var(--line); border-radius:999px; padding:3px; background:var(--bg-raised); }
+  .seg button{
+    font:500 0.88rem/1 var(--sans); color:var(--text-dim);
+    background:none; border:0; padding:10px 16px; border-radius:999px; cursor:pointer;
+  }
+  .seg button:hover{ color:var(--text); }
+  .seg button[aria-pressed="true"]{ background:var(--accent); color:#14110a; }
+  .seg.small button{ padding:7px 12px; font-size:0.8rem; }
+
+  .stage{
+    width:100%; max-width:1080px;
+    display:grid; grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);
+    gap:22px; align-items:start;
+  }
+  @media (max-width:820px){ .stage{ grid-template-columns:1fr; } }
+  @media (max-width:600px){ body{ padding:28px 12px 56px; } .plate{ padding:6px 6px 8px; } .panel{ padding:18px; } }
+
+  .plate{ margin:0; background:var(--bg-raised); border:1px solid var(--line); border-radius:6px; padding:12px 12px 10px; }
+  .plate svg{ display:block; width:100%; height:auto; touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+  figcaption{ font-family:var(--sans); font-size:0.78rem; color:var(--text-dim); text-align:center; margin-top:4px; }
+
+  .panel{ background:var(--bg-raised); border:1px solid var(--line); border-radius:6px; padding:22px; }
+
+  /* Diagram */
+  .part{ cursor:pointer; transition:opacity .2s ease, filter .2s ease; outline:none; }
+  svg.focus .part:not(.hl){ opacity:.28; }
+  .part.hl{ filter:drop-shadow(0 0 3px var(--focus)) drop-shadow(0 0 9px rgba(232,200,116,.55)); }
+  .part.ok{ filter:drop-shadow(0 0 4px #7ee07e) drop-shadow(0 0 10px rgba(126,224,126,.65)); }
+  .part.bad{ filter:drop-shadow(0 0 4px #ff6b6b) drop-shadow(0 0 10px rgba(255,107,107,.65)); }
+  .part:focus-visible{ filter:drop-shadow(0 0 2px #fff) drop-shadow(0 0 6px var(--focus)); }
+  .hit{ fill:transparent; }
+  .hit-stroke{ fill:none; stroke:transparent; }
+  .pin{ cursor:pointer; }
+  .pin .face{ fill:rgba(11,12,14,.86); stroke:var(--accent); stroke-width:1.6; }
+  .pin .lead{ stroke:var(--focus); stroke-width:1.4; }
+  .pin .anchor{ fill:var(--focus); }
+  .pin.solved .lead{ stroke:#7ccf7c; }
+  .pin.solved .anchor{ fill:#7ccf7c; }
+  .pin text{ font:700 12px var(--sans); fill:var(--text); text-anchor:middle; pointer-events:none; }
+  .pin.solved .face{ fill:#1f3d22; stroke:#7ccf7c; }
+  .pin.sel .face{ fill:var(--accent); stroke:var(--focus); }
+  .pin.sel text{ fill:#14110a; }
+  svg.nopins #pins{ display:none; }
+
+  /* Panel content */
+  .info h2{ font-family:var(--display); font-weight:400; font-size:1.55rem; line-height:1.2; margin:0 0 4px; }
+  .meta{ font-family:var(--sans); font-size:0.8rem; color:var(--text-dim); margin:0 0 12px; }
+  .info p{ margin:0; }
+  .hook{ color:var(--focus); font-style:italic; margin-top:10px !important; }
+  .muted{ color:var(--text-dim); }
+
+  .legend{
+    list-style:none; margin:18px 0 0; padding:14px 0 0;
+    border-top:1px solid var(--line);
+    display:grid; grid-template-columns:1fr 1fr; gap:2px 10px;
+  }
+  @media (max-width:820px) and (min-width:480px){ .legend{ grid-template-columns:1fr 1fr 1fr; } }
+  @media (max-width:380px){ .legend{ grid-template-columns:1fr; } }
+  .legend button{
+    display:flex; align-items:center; gap:9px; width:100%; text-align:left;
+    background:none; border:0; color:var(--text); font:inherit; font-size:0.95rem; line-height:1.25;
+    padding:6px 4px; border-radius:4px; cursor:pointer;
+  }
+  .legend button:hover{ background:#1b1d21; }
+  .legend button.on{ background:#1d1a10; color:var(--focus); }
+  .legend button:disabled{ cursor:default; }
+  .legend button:disabled:hover{ background:none; }
+  .num{
+    flex:none; width:22px; height:22px; border-radius:50%;
+    border:1.5px solid var(--accent); display:grid; place-items:center;
+    font:700 0.72rem/1 var(--sans); color:var(--text);
+  }
+  .legend .solved .num{ border-color:#7ccf7c; background:#1f3d22; }
+  .blank{ color:var(--text-dim); }
+
+  .status{ margin:0 0 4px; }
+  .progress{ font-family:var(--sans); font-size:0.8rem; color:var(--text-dim); margin:0; }
+  .bank{ display:flex; flex-wrap:wrap; gap:8px; margin:16px 0 0; }
+  .chip{
+    font:500 0.88rem/1.2 var(--sans); background:var(--bg); color:var(--text);
+    border:1px solid #33363c; border-radius:999px; padding:8px 13px; cursor:pointer;
+  }
+  .chip:hover{ border-color:var(--accent-dim); }
+  .chip.on{ border-color:var(--accent); color:var(--focus); background:#1d1a10; }
+  .chip.shake{ animation:shake .42s; border-color:#d05555; color:var(--bad); }
+  @keyframes shake{
+    0%,100%{ transform:translateX(0); } 20%{ transform:translateX(-5px); }
+    40%{ transform:translateX(5px); } 60%{ transform:translateX(-3px); } 80%{ transform:translateX(3px); }
+  }
+
+  .actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
+  .btn{
+    font:500 0.85rem/1 var(--sans); background:none; color:var(--accent);
+    border:1px solid var(--accent-dim); border-radius:4px; padding:10px 14px; cursor:pointer;
+  }
+  .btn:hover{ background:#1d1a10; }
+  .btn.primary{ background:var(--accent); color:#14110a; border-color:var(--accent); }
+
+  .prompt{ margin:16px 0 8px; padding:14px 16px; border-left:3px solid var(--accent); background:var(--bg); border-radius:0 4px 4px 0; }
+  .prompt .lead{ font-family:var(--sans); font-size:0.82rem; color:var(--text-dim); }
+  .prompt strong{ display:block; font-family:var(--display); font-weight:400; font-size:1.65rem; line-height:1.2; margin-top:2px; }
+  .prompt strong.clue{ font-family:inherit; font-size:1.1rem; line-height:1.45; }
+  .feedback{ min-height:1.55em; margin:4px 0 6px; }
+  .feedback.good{ color:var(--good); }
+  .feedback.badc{ color:var(--bad); }
+  .row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .row .lbl{ font-family:var(--sans); font-size:0.8rem; color:var(--text-dim); }
+
+  .compare{ width:100%; max-width:1080px; margin-top:22px; background:var(--bg-raised); border:1px solid var(--line); border-radius:6px; padding:24px; }
+  .compare h2{ font-family:var(--display); font-weight:400; font-size:1.35rem; margin:0 0 16px; }
+  .cols{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  @media (max-width:720px){ .cols{ grid-template-columns:1fr; gap:16px; } }
+  .compare h3{ font-family:var(--sans); font-size:0.9rem; font-weight:600; margin:0 0 6px; color:var(--focus); }
+  .compare ul{ margin:0; padding-left:1.1em; }
+  .compare li{ margin:2px 0; }
+  .compare p.note{ margin:18px 0 0; padding-top:14px; border-top:1px solid var(--line); color:var(--text-dim); max-width:80ch; }
+
+  @media (prefers-reduced-motion:reduce){
+    .chip.shake{ animation:none; }
+    .part{ transition:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="links"><a href="/" class="backlink">&larr; Back to scotthilsee.com</a></div>
+
+<h1>Cell Parts Study Aid</h1>
+<p class="sub">Learn the parts of animal and plant cells, then test yourself by labeling the diagram or finding each part from its name or its job.</p>
+
+<div class="controls">
+  <div class="seg" id="cellSeg" aria-label="Cell type">
+    <button type="button" data-cell="animal" aria-pressed="true">Animal cell</button>
+    <button type="button" data-cell="plant" aria-pressed="false">Plant cell</button>
+  </div>
+  <div class="seg" id="modeSeg" aria-label="Mode">
+    <button type="button" data-mode="study" aria-pressed="true">Study</button>
+    <button type="button" data-mode="label" aria-pressed="false">Label</button>
+    <button type="button" data-mode="find" aria-pressed="false">Find</button>
+  </div>
+</div>
+
+<main class="stage">
+  <figure class="plate">
+    <svg id="cell" viewBox="20 12 560 414" role="img" aria-label="Cell diagram"></svg>
+    <figcaption id="caption"></figcaption>
+  </figure>
+  <aside class="panel" id="panel" aria-live="polite"></aside>
+</main>
+
+<section class="compare">
+  <h2>Animal vs. plant cells</h2>
+  <div class="cols">
+    <div>
+      <h3>Plant cells only</h3>
+      <ul>
+        <li>Cell wall</li>
+        <li>Chloroplasts</li>
+        <li>Large central vacuole (animal cells have small ones, if any)</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Both</h3>
+      <ul>
+        <li>Cell membrane and cytoplasm</li>
+        <li>Nucleus, nuclear envelope, nucleolus</li>
+        <li>Rough and smooth ER, ribosomes</li>
+        <li>Golgi apparatus and vesicles</li>
+        <li>Mitochondria</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Animal cells only</h3>
+      <ul>
+        <li>Centrioles</li>
+        <li>Lysosomes (mainly; rare in plant cells)</li>
+      </ul>
+    </div>
+  </div>
+  <p class="note">Plant cells hold a fixed, boxy shape because of the wall; animal cells are rounder and can change shape. A common mix-up: plant cells have mitochondria too. Chloroplasts make sugar from sunlight, and mitochondria release the energy stored in that sugar, so plants need both.</p>
+</section>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- Content ---------- */
+const PARTS = {
+  membrane:{ name:"Cell membrane", ref:"the cell membrane", alt:"Also called the plasma membrane", where:"Animal and plant cells",
+    fn:"A thin, flexible double layer of phospholipids with proteins embedded in it. It is selectively permeable: it lets some substances in and out while keeping others out.",
+    hook:"the security gate", clue:"Thin, flexible boundary that controls what enters and leaves the cell." },
+  cytoplasm:{ name:"Cytoplasm", ref:"the cytoplasm", where:"Animal and plant cells",
+    fn:"The jelly-like fluid (cytosol) that fills the cell, plus everything floating in it outside the nucleus. Many chemical reactions, such as the first step of breaking down glucose, happen here.",
+    hook:"the factory floor", clue:"Jelly-like fluid that fills the cell and surrounds the organelles." },
+  nucleus:{ name:"Nucleus", ref:"the nucleus", where:"Animal and plant cells",
+    fn:"Holds most of the cell's DNA, spread out as chromatin. It controls the cell's activities by deciding which genes are used to make proteins.",
+    hook:"the control center", clue:"Holds the cell's DNA and controls the cell's activities." },
+  envelope:{ name:"Nuclear envelope", ref:"the nuclear envelope", alt:"Also called the nuclear membrane", where:"Animal and plant cells",
+    fn:"A double membrane around the nucleus. Nuclear pores in it let messenger RNA and ribosome parts out and let needed proteins in.",
+    hook:"the walls and doors of the control center", clue:"Double membrane with pores that wraps around the cell's DNA." },
+  nucleolus:{ name:"Nucleolus", ref:"the nucleolus", where:"Animal and plant cells",
+    fn:"A dense region inside the nucleus where ribosomal RNA is made and the pieces of ribosomes are put together.",
+    hook:"the ribosome workshop", clue:"Dense spot inside the nucleus where ribosome parts are made." },
+  rer:{ name:"Rough ER", ref:"the rough ER", alt:"Rough endoplasmic reticulum", where:"Animal and plant cells",
+    fn:"Folded membranes studded with ribosomes, usually right next to the nucleus. It makes and folds proteins that will go into membranes or be shipped out of the cell.",
+    hook:"the protein assembly line (rough because of the ribosomes)", clue:"Folded membranes covered in ribosomes that make proteins to be shipped." },
+  ser:{ name:"Smooth ER", ref:"the smooth ER", alt:"Smooth endoplasmic reticulum", where:"Animal and plant cells",
+    fn:"Tube-shaped membranes with no ribosomes. It makes lipids (fats, phospholipids, and steroids), breaks down some drugs and poisons, and stores calcium.",
+    hook:"the lipid lab and detox center", clue:"Ribosome-free tubes that make lipids and break down toxins." },
+  ribosome:{ name:"Ribosomes", ref:"the ribosomes", plural:true, where:"Animal and plant cells",
+    fn:"Tiny structures made of RNA and protein that build proteins by reading messenger RNA. Some float free in the cytoplasm; others are attached to the rough ER.",
+    hook:"the builders", clue:"Tiny structures floating in the cytoplasm that build proteins." },
+  golgi:{ name:"Golgi apparatus", ref:"the Golgi apparatus", alt:"Also called the Golgi body", where:"Animal and plant cells",
+    fn:"A stack of flattened sacs that receives proteins and lipids from the ER, modifies and sorts them, and packages them into vesicles for delivery.",
+    hook:"the post office", clue:"Stack of flattened sacs that sorts, packages, and ships proteins." },
+  vesicle:{ name:"Vesicle", ref:"a vesicle", where:"Animal and plant cells",
+    fn:"A small membrane bubble that carries materials between organelles, or to the cell membrane to be released outside the cell.",
+    hook:"the delivery trucks", clue:"Small bubble that carries materials around the cell." },
+  mito:{ name:"Mitochondrion", ref:"a mitochondrion", alt:"Plural: mitochondria", where:"Animal and plant cells",
+    fn:"Carries out cellular respiration, releasing the energy stored in glucose as ATP. Its folded inner membrane (cristae) gives it lots of working surface, and it has its own DNA.",
+    hook:"the powerhouse", clue:"Releases energy from food as ATP during cellular respiration." },
+  lysosome:{ name:"Lysosome", ref:"a lysosome", where:"Mainly animal cells (in plants, the vacuole does much of this job)",
+    fn:"A membrane sac full of digestive enzymes. It breaks down worn-out cell parts, food particles, and bacteria the cell has taken in.",
+    hook:"the cleanup and recycling crew", clue:"Sac of digestive enzymes that breaks down waste and worn-out parts." },
+  centrioles:{ name:"Centrioles", ref:"the centrioles", plural:true, where:"Animal cells (most plant cells lack them)",
+    fn:"A pair of short barrels made of microtubules, set at right angles to each other. They help organize the spindle fibers that pull chromosomes apart when the cell divides.",
+    hook:"the cell-division organizers", clue:"Pair of microtubule barrels that help the cell divide." },
+  wall:{ name:"Cell wall", ref:"the cell wall", where:"Plant cells (fungi and bacteria have walls too, made of different materials)",
+    fn:"A stiff layer made mostly of cellulose, outside the cell membrane. It supports and protects the cell, gives it a fixed shape, and keeps it from bursting when it takes in water.",
+    hook:"the frame of the house", clue:"Stiff outer layer of cellulose that supports and protects the cell." },
+  chloroplast:{ name:"Chloroplast", ref:"a chloroplast", where:"Plant cells (and algae)",
+    fn:"Carries out photosynthesis. Green chlorophyll in its stacked membranes (grana) captures light energy, which is used to make glucose from carbon dioxide and water.",
+    hook:"the solar panel", clue:"Captures sunlight to make sugar by photosynthesis." },
+  vacuole:{ name:"Central vacuole", ref:"the central vacuole", where:"Plant cells (animal cells may have small, temporary vacuoles)",
+    fn:"A large sac of watery cell sap that stores water, nutrients, and wastes. When it is full, it presses outward against the wall (turgor pressure) and keeps the plant firm.",
+    hook:"the water tower", clue:"Large sac of water that presses outward and keeps the cell firm." }
+};
+
+/* ---------- Drawing helpers ---------- */
+const f = n => Math.round(n*10)/10;
+function pt(cx,cy,rx,ry,deg){ const r=deg*Math.PI/180; return [cx+rx*Math.cos(r), cy+ry*Math.sin(r)]; }
+function arc(cx,cy,rx,ry,a0,a1){
+  const [x0,y0]=pt(cx,cy,rx,ry,a0), [x1,y1]=pt(cx,cy,rx,ry,a1);
+  return `M${f(x0)} ${f(y0)} A${rx} ${ry} 0 0 1 ${f(x1)} ${f(y1)}`;
+}
+const P = (id, inner) => `<g class="part" data-part="${id}">${inner}</g>`;
+
+function roughER(cx,cy,radii,dy,a0,a1){
+  let s='';
+  radii.forEach(rx=>{
+    const ry=rx-dy, d=arc(cx,cy,rx,ry,a0,a1);
+    s+=`<path d="${d}" class="hit-stroke" stroke-width="18"/>`;
+    s+=`<path d="${d}" fill="none" stroke="#4a7fb0" stroke-width="8" stroke-linecap="round"/>`;
+    s+=`<path d="${d}" fill="none" stroke="#14304a" stroke-width="2.4" stroke-linecap="round"/>`;
+    for(let a=a0+5;a<a1;a+=10){ const [x,y]=pt(cx,cy,rx+6.5,ry+6.5,a); s+=`<circle cx="${f(x)}" cy="${f(y)}" r="2.1" fill="#ece4cf"/>`; }
+  });
+  return P('rer', s);
+}
+function smoothER(rows, hit){
+  let s=`<rect x="${hit[0]}" y="${hit[1]}" width="${hit[2]}" height="${hit[3]}" class="hit"/>`;
+  rows.forEach(([x,y])=>{
+    const d=`M${x} ${y} q15 -12 30 0 t30 0 t30 0`;
+    s+=`<path d="${d}" fill="none" stroke="#5fb3a8" stroke-width="7" stroke-linecap="round"/>`;
+    s+=`<path d="${d}" fill="none" stroke="#0f2f2b" stroke-width="2.2" stroke-linecap="round"/>`;
+  });
+  return P('ser', s);
+}
+function golgi(x,cy,lens){
+  const span=Math.max(...lens);
+  let s=`<ellipse cx="${x+24}" cy="${cy}" rx="38" ry="${span+10}" class="hit"/>`;
+  lens.forEach((L,i)=>{
+    const x0=x+i*11, d=`M${x0} ${cy-L} Q${x0+30} ${cy} ${x0} ${cy+L}`;
+    s+=`<path d="${d}" fill="none" stroke="#e39b54" stroke-width="7" stroke-linecap="round"/>`;
+    s+=`<path d="${d}" fill="none" stroke="#5b3412" stroke-width="2" stroke-linecap="round"/>`;
+  });
+  return P('golgi', s);
+}
+function mito(x,y,rot,rx=30,ry=14){
+  const n=Math.floor((2*rx-14)/6), start=-(n*6)/2, amp=ry-5;
+  let d=`M${start} 0`;
+  for(let k=0;k<n;k++){ d+=` L${f(start+(k+0.5)*6)} ${k%2?amp:-amp}`; }
+  d+=` L${f(start+n*6)} 0`;
+  return `<g transform="translate(${x} ${y}) rotate(${rot})"><ellipse rx="${rx}" ry="${ry}" fill="#8f3d33" stroke="#e07a63" stroke-width="2"/><path d="${d}" fill="none" stroke="#f2b6a3" stroke-width="1.5" stroke-linejoin="round"/></g>`;
+}
+function chloro(x,y,rot){
+  let s=`<g transform="translate(${x} ${y}) rotate(${rot})"><ellipse rx="27" ry="14" fill="#2b6a33" stroke="#7bd47b" stroke-width="2"/><line x1="-19" y1="0" x2="19" y2="0" stroke="#5aa85a" stroke-width="1"/>`;
+  [-13,0,13].forEach(cx=>{ [-5,-1.4,2.2].forEach(dy=>{ s+=`<rect x="${cx-4.5}" y="${dy}" width="9" height="2.6" rx="1" fill="#b4ec9f"/>`; }); });
+  return s+'</g>';
+}
+function lyso(x,y,r=12){
+  return `<circle cx="${x}" cy="${y}" r="${r}" fill="#7d3352" stroke="#e07aa6" stroke-width="2"/>`+
+    [[-4,-3],[3,-4],[4,3],[-2,4]].map(([dx,dy])=>`<circle cx="${x+dx}" cy="${y+dy}" r="1.6" fill="#f3bfd4"/>`).join('');
+}
+function vesicle(x,y){
+  return `<circle cx="${x}" cy="${y}" r="13" class="hit"/><circle cx="${x}" cy="${y}" r="8" fill="#22343f" stroke="#9ec3d8" stroke-width="2"/>`;
+}
+function cluster(x,y){
+  return `<circle cx="${x}" cy="${y}" r="13" class="hit"/>`+
+    [[0,0],[6,3],[-5,5],[3,-6],[-6,-4]].map(([dx,dy])=>`<circle cx="${x+dx}" cy="${y+dy}" r="2.6" fill="#ece4cf"/>`).join('');
+}
+function nucleusSet(cx,cy,rx,ry,scale,nucleolus){
+  const chrom=["M-50 -25 q10 -12 22 -2 t20 4","M-45 30 q14 10 28 0 t26 6","M25 35 q10 -10 22 0","M-25 0 q8 8 18 0 t16 -4","M38 -30 q6 10 16 4"]
+    .map(d=>`<path d="${d}" fill="none" stroke="#7c66b8" stroke-width="${f(2/scale)}" stroke-linecap="round"/>`).join('');
+  const nuc = P('nucleus', `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="#352a55"/><g transform="translate(${cx} ${cy}) scale(${scale})">${chrom}</g>`);
+  const env = P('envelope',
+    `<ellipse cx="${cx}" cy="${cy}" rx="${rx-2.5}" ry="${ry-2.5}" class="hit-stroke" stroke-width="12"/>`+
+    `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="none" stroke="#b39ae8" stroke-width="2.6" stroke-dasharray="22 4"/>`+
+    `<ellipse cx="${cx}" cy="${cy}" rx="${rx-5}" ry="${ry-5}" fill="none" stroke="#b39ae8" stroke-width="1.3" stroke-dasharray="22 4"/>`);
+  const [nx,ny,nr]=nucleolus;
+  const nol = P('nucleolus', `<circle cx="${nx}" cy="${ny}" r="${nr}" fill="#6a4cb3" stroke="#a58ce0" stroke-width="1.5"/>`);
+  return nuc+env+nol;
+}
+
+/* ---------- Cells ---------- */
+function animalSVG(){
+  const body="M300 38 C420 34 540 90 556 200 C572 310 480 404 330 408 C190 412 52 360 44 236 C36 120 170 42 300 38Z";
+  return [
+    P('cytoplasm', `<path d="${body}" fill="#172430"/>`),
+    P('membrane', `<path d="${body}" class="hit-stroke" stroke-width="16"/><path d="${body}" fill="none" stroke="#d98c6a" stroke-width="5"/><path d="${body}" fill="none" stroke="#172430" stroke-width="1.2"/>`),
+    roughER(275,215,[95,110,125],12,-55,55),
+    smoothER([[362,322],[358,338],[366,354]],[352,304,112,62]),
+    golgi(418,140,[29,35,35,29]),
+    P('mito', mito(130,150,-25)+mito(152,322,20)+mito(458,236,70)),
+    P('lysosome', lyso(105,215)+lyso(300,365)),
+    P('centrioles',
+      `<rect x="180" y="84" width="56" height="40" class="hit"/>`+
+      `<rect x="186" y="99" width="28" height="11" rx="2" fill="#5f594f" stroke="#cfc6b4" stroke-width="1.5"/>`+
+      [193,200,207].map(x=>`<line x1="${x}" y1="101" x2="${x}" y2="108" stroke="#cfc6b4" stroke-width="1"/>`).join('')+
+      `<rect x="219" y="89" width="11" height="28" rx="2" fill="#5f594f" stroke="#cfc6b4" stroke-width="1.5"/>`+
+      [96,103,110].map(y=>`<line x1="221" y1="${y}" x2="228" y2="${y}" stroke="#cfc6b4" stroke-width="1"/>`).join('')),
+    P('vesicle', vesicle(385,85)+vesicle(498,158)+vesicle(520,262)),
+    P('ribosome', cluster(190,258)+cluster(92,292)+cluster(268,90)+cluster(498,305)),
+    nucleusSet(275,215,78,66,1,[292,205,21])
+  ].join('');
+}
+function plantSVG(){
+  return [
+    P('wall', `<rect x="30" y="25" width="540" height="390" rx="16" fill="#3b5422" stroke="#8ab356" stroke-width="2"/><rect x="34.5" y="29.5" width="531" height="381" rx="13" fill="none" stroke="#56772f" stroke-width="1"/>`),
+    P('cytoplasm', `<rect x="42" y="37" width="516" height="366" rx="8" fill="#172430"/>`),
+    P('membrane', `<rect x="42" y="37" width="516" height="366" rx="8" class="hit-stroke" stroke-width="8"/><rect x="42" y="37" width="516" height="366" rx="8" fill="none" stroke="#d98c6a" stroke-width="5"/><rect x="42" y="37" width="516" height="366" rx="8" fill="none" stroke="#172430" stroke-width="1.2"/>`),
+    P('vacuole', `<rect x="240" y="70" width="270" height="210" rx="60" fill="#1d4260" stroke="#77bbe6" stroke-width="2.5"/><path d="M272 110 q20 -22 52 -24" fill="none" stroke="#3f77a0" stroke-width="3" stroke-linecap="round"/>`),
+    roughER(125,160,[75,88,101],7,40,125),
+    smoothER([[72,292],[76,308],[70,324]],[62,276,112,62]),
+    golgi(206,342,[26,32,32,26]),
+    P('mito', mito(318,332,15,28,13)+mito(440,320,-10,28,13)+mito(205,58,0,28,13)),
+    P('chloroplast', chloro(110,68,0)+chloro(112,370,0)+chloro(370,378,0)+chloro(495,368,0)+chloro(534,175,90)),
+    P('ribosome', cluster(200,115)+cluster(218,262)+cluster(282,382)+cluster(432,378)),
+    nucleusSet(125,160,62,55,0.79,[138,150,17])
+  ].join('');
+}
+
+const CELLS = {
+  animal:{
+    title:"Animal cell", draw:animalSVG,
+    order:["membrane","cytoplasm","nucleus","envelope","nucleolus","rer","ser","ribosome","golgi","vesicle","mito","lysosome","centrioles"],
+    pins:{ membrane:[300,39], cytoplasm:[232,330], nucleus:[248,242], envelope:[197,215], nucleolus:[300,200,322,176], rer:[399,205,420,188],
+           ser:[412,356,412,380], ribosome:[192,262,208,287], golgi:[462,128,490,120], vesicle:[379,80,356,70], mito:[132,141,124,116], lysosome:[100,223,82,250], centrioles:[203,99,203,76] }
+  },
+  plant:{
+    title:"Plant cell", draw:plantSVG,
+    order:["wall","membrane","cytoplasm","vacuole","nucleus","envelope","nucleolus","rer","ser","ribosome","golgi","mito","chloroplast"],
+    pins:{ wall:[36,230], membrane:[300,37], cytoplasm:[365,300], vacuole:[375,175], nucleus:[100,182], envelope:[63,160], nucleolus:[146,140,160,124],
+           rer:[140,240], ser:[162,300,184,300], ribosome:[204,120,224,142], golgi:[210,356,184,374], mito:[312,323,294,302], chloroplast:[534,152,534,126] }
+  }
+};
+
+/* ---------- State ---------- */
+const svg = document.getElementById('cell');
+const panel = document.getElementById('panel');
+const caption = document.getElementById('caption');
+let cell='animal', mode='study', sel=null;
+let label, find;
+let findPrompt='name';
+
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function resetLabel(){ label={ placed:new Set(), misses:0, pin:null, chip:null, msg:'', chips:shuffle(CELLS[cell].order) }; }
+function resetFind(){ find={ queue:shuffle(CELLS[cell].order), i:0, score:0, tries:0, revealed:false, msg:'', cls:'', lock:false, done:false, token:(find?find.token+1:0) }; }
+const thats = id => (PARTS[id].plural ? "Those are " : "That's ") + PARTS[id].ref;
+const isAre = id => PARTS[id].plural ? "are" : "is";
+const cap = s => s.charAt(0).toUpperCase()+s.slice(1);
+
+/* ---------- Rendering ---------- */
+const smallScreen = window.matchMedia('(max-width:600px)');
+function drawCell(){
+  const c=CELLS[cell], big=smallScreen.matches;
+  const pins = '<g id="pins">'+c.order.map((id,i)=>{
+    const v=c.pins[id], x=v.length>2?v[2]:v[0], y=v.length>2?v[3]:v[1];
+    const lead = v.length>2 ? `<line x1="${v[2]}" y1="${v[3]}" x2="${v[0]}" y2="${v[1]}" class="lead"/><circle cx="${v[0]}" cy="${v[1]}" r="2.4" class="anchor"/>` : '';
+    return `<g class="pin" data-pin="${id}">${lead}<g transform="translate(${x} ${y})"><circle r="${big?22:18}" class="hit"/><circle r="${big?15:12}" class="face"/><text y="${big?5:4}" style="font-size:${big?15:12}px">${i+1}</text></g></g>`;
+  }).join('')+'</g>';
+  svg.innerHTML = c.draw() + pins;
+  svg.setAttribute('aria-label', c.title+' diagram with '+c.order.length+' numbered parts');
+  svg.querySelectorAll('.part').forEach(g=>{
+    g.setAttribute('tabindex','0'); g.setAttribute('role','button');
+    g.setAttribute('aria-label', mode==='find' ? 'Cell part' : PARTS[g.dataset.part].name);
+  });
+  caption.textContent = c.title+', simplified and not to scale';
+}
+
+function updateDiagram(){
+  let hl=null;
+  if(mode==='study') hl=sel;
+  else if(mode==='label') hl=label.pin;
+  else if(mode==='find' && find.revealed && !find.done) hl=find.queue[find.i];
+  svg.classList.toggle('focus', !!hl);
+  svg.classList.toggle('nopins', mode==='find');
+  svg.querySelectorAll('.part').forEach(g=>{
+    g.classList.toggle('hl', g.dataset.part===hl);
+    g.setAttribute('aria-label', mode==='find' ? 'Cell part' : PARTS[g.dataset.part].name);
+  });
+  svg.querySelectorAll('.pin').forEach(p=>{
+    const id=p.dataset.pin;
+    p.classList.toggle('sel', (mode==='study' && sel===id) || (mode==='label' && label.pin===id));
+    p.classList.toggle('solved', mode==='label' && label.placed.has(id));
+  });
+}
+
+function legendHTML(kind){
+  const order=CELLS[cell].order;
+  return '<ol class="legend">'+order.map((id,i)=>{
+    if(kind==='study'){
+      return `<li><button type="button" data-pick="${id}" class="${sel===id?'on':''}"><span class="num">${i+1}</span>${PARTS[id].name}</button></li>`;
+    }
+    const done=label.placed.has(id);
+    return `<li><button type="button" data-pick="${id}" class="${done?'solved':''} ${label.pin===id?'on':''}" ${done?'disabled':''}><span class="num">${i+1}</span>${done?PARTS[id].name:'<span class="blank">?</span>'}</button></li>`;
+  }).join('')+'</ol>';
+}
+
+function renderPanel(){
+  const order=CELLS[cell].order, n=order.length;
+  let h='';
+  if(mode==='study'){
+    if(sel){
+      const p=PARTS[sel];
+      h+=`<div class="info"><h2>${p.name}</h2><p class="meta">${p.alt?p.alt+'. ':''}Found in: ${p.where}</p><p>${p.fn}</p><p class="hook">Think of it as ${p.hook}.</p></div>`;
+    } else {
+      h+=`<div class="info"><p class="muted">Tap any part of the diagram, or a name below, to see what it does. When you feel ready, switch to Label or Find to test yourself.</p></div>`;
+    }
+    h+=legendHTML('study');
+  }
+  else if(mode==='label'){
+    const placed=label.placed.size, done=placed===n;
+    let status;
+    if(done){ status=`All ${n} parts labeled with ${label.misses} ${label.misses===1?'miss':'misses'} (${Math.round(100*n/(n+label.misses))}% accuracy).`; }
+    else if(label.msg){ status=label.msg; }
+    else if(label.pin){ status=`Choose the name for part ${order.indexOf(label.pin)+1}.`; }
+    else if(label.chip){ status=`Now tap where ${PARTS[label.chip].ref} goes.`; }
+    else { status='Tap a numbered part, then choose its name. You can also pick a name first.'; }
+    h+=`<p class="status">${status}</p><p class="progress">${placed} of ${n} labeled, ${label.misses} ${label.misses===1?'miss':'misses'}</p>`;
+    if(!done){
+      h+='<div class="bank">'+label.chips.filter(id=>!label.placed.has(id)).map(id=>`<button type="button" class="chip ${label.chip===id?'on':''}" data-chip="${id}">${PARTS[id].name}</button>`).join('')+'</div>';
+    }
+    h+=legendHTML('label');
+    h+=`<div class="actions"><button type="button" class="btn ${done?'primary':''}" data-act="reset-label">${done?'Label it again':'Start over'}</button></div>`;
+  }
+  else {
+    h+=`<div class="row"><span class="lbl">Show me the part's</span><div class="seg small">`+
+       `<button type="button" data-prompt="name" aria-pressed="${findPrompt==='name'}">Name</button>`+
+       `<button type="button" data-prompt="clue" aria-pressed="${findPrompt==='clue'}">Job</button></div></div>`;
+    if(find.done){
+      h+=`<div class="prompt"><span class="lead">Finished</span><strong>${find.score} of ${n} on the first try</strong></div>`;
+      h+=`<div class="actions"><button type="button" class="btn primary" data-act="restart-find">Play again</button></div>`;
+    } else {
+      const t=find.queue[find.i], p=PARTS[t];
+      h+= findPrompt==='name'
+        ? `<div class="prompt"><span class="lead">Tap the</span><strong>${p.name}</strong></div>`
+        : `<div class="prompt"><span class="lead">Tap the part that does this</span><strong class="clue">${p.clue}</strong></div>`;
+      h+=`<p class="feedback ${find.cls}">${find.msg}</p>`;
+      h+=`<p class="progress">Question ${find.i+1} of ${n}. First-try score: ${find.score}</p>`;
+      h+=`<div class="actions"><button type="button" class="btn ${find.revealed?'primary':''}" data-act="next">${find.revealed?'Next question':'Skip'}</button><button type="button" class="btn" data-act="restart-find">Start over</button></div>`;
+    }
+  }
+  panel.innerHTML=h;
+}
+
+function render(){ updateDiagram(); renderPanel(); }
+
+function flashPart(id, cls){
+  svg.querySelectorAll(`[data-part="${id}"]`).forEach(el=>{
+    el.classList.remove('ok','bad'); void el.getBoundingClientRect(); el.classList.add(cls);
+    setTimeout(()=>el.classList.remove(cls), 750);
+  });
+}
+function shakeChip(id){
+  const b=panel.querySelector(`[data-chip="${id}"]`);
+  if(b){ b.classList.add('shake'); setTimeout(()=>b.classList.remove('shake'), 450); }
+}
+
+/* ---------- Interaction ---------- */
+function place(id){
+  label.placed.add(id); label.pin=null; label.chip=null; label.msg='';
+  flashPart(id,'ok'); render();
+}
+function onPick(id){
+  if(mode==='study'){ sel = sel===id ? null : id; render(); return; }
+  if(mode==='label'){
+    if(label.placed.has(id)) return;
+    label.msg='';
+    if(label.chip){
+      if(label.chip===id){ place(id); }
+      else { label.misses++; flashPart(id,'bad'); label.msg=`Not there. Try another spot for ${PARTS[label.chip].ref}.`; render(); }
+      return;
+    }
+    label.pin = label.pin===id ? null : id; render(); return;
+  }
+  findPick(id);
+}
+function onChip(id){
+  label.msg='';
+  if(label.pin){
+    if(label.pin===id){ place(id); }
+    else { label.misses++; render(); shakeChip(id); }
+    return;
+  }
+  label.chip = label.chip===id ? null : id; render();
+}
+function findPick(id){
+  if(find.done || find.revealed || find.lock) return;
+  const t=find.queue[find.i];
+  if(id===t){
+    if(find.tries===0) find.score++;
+    find.msg='Correct.'; find.cls='good'; find.lock=true;
+    flashPart(id,'ok'); renderPanel();
+    const tok=find.token;
+    setTimeout(()=>{ if(find.token!==tok) return; find.lock=false; nextQ(); }, 850);
+  } else {
+    find.tries++; flashPart(id,'bad'); find.cls='badc';
+    if(find.tries>=2){ find.revealed=true; find.msg=`${thats(id)}. ${cap(PARTS[t].ref)} ${isAre(t)} highlighted.`; }
+    else { find.msg=`${thats(id)}. Try again.`; }
+    render();
+  }
+}
+function nextQ(){
+  find.i++; find.tries=0; find.revealed=false; find.msg=''; find.cls='';
+  if(find.i>=find.queue.length) find.done=true;
+  render();
+}
+
+svg.addEventListener('click', e=>{
+  const pin=e.target.closest('[data-pin]');
+  const part=e.target.closest('[data-part]');
+  const id = pin ? pin.dataset.pin : part ? part.dataset.part : null;
+  if(id) onPick(id);
+});
+svg.addEventListener('keydown', e=>{
+  if((e.key==='Enter'||e.key===' ') && e.target.dataset && e.target.dataset.part){ e.preventDefault(); onPick(e.target.dataset.part); }
+});
+panel.addEventListener('click', e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  if(b.dataset.pick) onPick(b.dataset.pick);
+  else if(b.dataset.chip) onChip(b.dataset.chip);
+  else if(b.dataset.prompt){ findPrompt=b.dataset.prompt; renderPanel(); }
+  else if(b.dataset.act==='reset-label'){ resetLabel(); render(); }
+  else if(b.dataset.act==='restart-find'){ resetFind(); render(); }
+  else if(b.dataset.act==='next'){ if(!find.lock) nextQ(); }
+});
+
+function setPressed(group, attr, val){
+  group.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset[attr]===val)));
+}
+const cellSeg=document.getElementById('cellSeg'), modeSeg=document.getElementById('modeSeg');
+cellSeg.addEventListener('click', e=>{
+  const b=e.target.closest('button'); if(!b || b.dataset.cell===cell) return;
+  cell=b.dataset.cell; setPressed(cellSeg,'cell',cell);
+  sel=null; resetLabel(); resetFind(); drawCell(); render();
+});
+modeSeg.addEventListener('click', e=>{
+  const b=e.target.closest('button'); if(!b || b.dataset.mode===mode) return;
+  mode=b.dataset.mode; setPressed(modeSeg,'mode',mode);
+  if(mode==='find' && (find.done || find.i>0)) resetFind();
+  render();
+});
+
+if(smallScreen.addEventListener) smallScreen.addEventListener('change', ()=>{ drawCell(); render(); });
+resetLabel(); resetFind(); drawCell(); render();
+})();
+</script>
+</body>
+</html>

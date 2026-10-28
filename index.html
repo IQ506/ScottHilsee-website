@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scott Hilsee — Voiceover</title>
+<meta name="description" content="Professional voiceover for documentary, explainer, industrial, medical, and PSA work. Broadcast-quality audio, fast turnaround.">
+<style>
+  :root{
+    --bg: #0b0c0e;
+    --bg-raised: #131417;
+    --line: #23252a;
+    --text: #ece9e3;
+    --text-dim: #9a9a97;
+    --accent: #c9a24b;
+    --accent-dim: #8a7333;
+    --focus: #e8c874;
+  }
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family: "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background:var(--accent-dim); color:#fff; }
+
+  a{ color:var(--accent); text-decoration:none; }
+  a:hover{ text-decoration:underline; }
+  :focus-visible{ outline:2px solid var(--focus); outline-offset:3px; }
+
+  .wrap{ max-width:920px; margin:0 auto; padding:0 24px; }
+
+  /* Header */
+  header{
+    position:sticky; top:0; z-index:20;
+    background:rgba(11,12,14,0.88);
+    backdrop-filter: blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 24px; max-width:920px; margin:0 auto;
+  }
+  .brand{
+    font-family:"Baskerville","Iowan Old Style",Georgia,serif;
+    font-size:1.05rem; letter-spacing:0.04em; color:var(--text);
+    display:flex; align-items:center; gap:10px;
+  }
+  .brand .mark{
+    width:9px; height:9px; border-radius:50%;
+    background:var(--accent);
+    box-shadow:0 0 0 3px rgba(201,162,75,0.15);
+  }
+  .navlinks{ display:flex; gap:26px; font-family:system-ui,-apple-system,sans-serif; font-size:0.82rem; letter-spacing:0.06em; text-transform:uppercase; }
+  .navlinks a{ color:var(--text-dim); }
+  .navlinks a:hover{ color:var(--accent); text-decoration:none; }
+  .navtoggle{ display:none; background:none; border:1px solid var(--line); color:var(--text); border-radius:4px; padding:6px 10px; font-size:1rem; }
+
+  @media (max-width:640px){
+    .navlinks{ display:none; }
+    .navtoggle{ display:block; }
+    .navlinks.open{ display:flex; flex-direction:column; position:absolute; top:64px; right:0; left:0; background:var(--bg-raised); border-bottom:1px solid var(--line); padding:16px 24px; gap:16px; }
+  }
+
+  /* Hero */
+  .hero{
+    padding:96px 0 72px;
+    border-bottom:1px solid var(--line);
+    position:relative;
+    overflow:hidden;
+  }
+  .hero-eyebrow{
+    font-family:system-ui,-apple-system,sans-serif;
+    font-size:0.78rem; letter-spacing:0.18em; text-transform:uppercase;
+    color:var(--accent); margin:0 0 18px;
+  }
+  .hero h1{
+    font-family:"Baskerville","Iowan Old Style",Georgia,serif;
+    font-weight:400;
+    font-size:clamp(2.4rem, 6vw, 4.1rem);
+    line-height:1.05;
+    margin:0 0 22px;
+    max-width:12ch;
+  }
+  .hero h1 em{ font-style:italic; color:var(--accent); }
+  .hero p{
+    font-size:1.15rem; color:var(--text-dim); max-width:46ch; margin:0 0 34px;
+  }
+  .hero-cta{ display:flex; gap:16px; flex-wrap:wrap; }
+  .btn{
+    font-family:system-ui,-apple-system,sans-serif;
+    font-size:0.85rem; letter-spacing:0.05em; text-transform:uppercase;
+    padding:13px 26px; border-radius:2px; display:inline-block;
+    border:1px solid var(--accent);
+  }
+  .btn:hover{ text-decoration:none; }
+  .btn-solid{ background:var(--accent); color:#141414; }
+  .btn-solid:hover{ background:var(--focus); }
+  .btn-ghost{ color:var(--text); border-color:var(--line); }
+  .btn-ghost:hover{ border-color:var(--accent); color:var(--accent); }
+
+  /* waveform flourish */
+  .wave{ display:flex; align-items:flex-end; gap:3px; height:38px; margin-top:44px; opacity:0.55; }
+  .wave span{
+    width:3px; background:var(--accent-dim); border-radius:2px;
+    animation: bob 2.4s ease-in-out infinite;
+  }
+  @keyframes bob{ 0%,100%{ transform:scaleY(0.35);} 50%{ transform:scaleY(1);} }
+  @media (prefers-reduced-motion: reduce){ .wave span{ animation:none; transform:scaleY(0.6);} html{scroll-behavior:auto;} }
+
+  section{ padding:72px 0; border-bottom:1px solid var(--line); }
+  .section-label{
+    font-family:system-ui,-apple-system,sans-serif;
+    font-size:0.78rem; letter-spacing:0.16em; text-transform:uppercase;
+    color:var(--accent); margin:0 0 8px;
+  }
+  h2{
+    font-family:"Baskerville","Iowan Old Style",Georgia,serif;
+    font-weight:400; font-size:1.9rem; margin:0 0 40px;
+  }
+
+  /* Demos */
+  .demo-grid{ display:grid; gap:1px; background:var(--line); border:1px solid var(--line); }
+  .demo{
+    background:var(--bg); padding:22px 24px;
+    display:grid; grid-template-columns:1fr auto; gap:6px 18px; align-items:center;
+  }
+  .demo-name{ font-size:1.08rem; }
+  .demo-tag{
+    font-family:system-ui,-apple-system,sans-serif; font-size:0.72rem;
+    letter-spacing:0.08em; text-transform:uppercase; color:var(--text-dim);
+    grid-column:1; margin-top:2px;
+  }
+  .demo audio{ grid-column:1/-1; width:100%; margin-top:12px; filter:invert(0.88) hue-rotate(180deg) contrast(0.9); }
+
+  /* Services */
+  .services{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:28px 40px; list-style:none; padding:0; margin:0; }
+  .services li{ padding-left:22px; position:relative; color:var(--text); }
+  .services li::before{ content:"—"; position:absolute; left:0; color:var(--accent); }
+  .services .note{ display:block; color:var(--text-dim); font-size:0.92rem; margin-top:2px; }
+
+  /* Studio */
+  .studio-grid{ display:grid; grid-template-columns:1fr 1fr; gap:40px; }
+  @media (max-width:640px){ .studio-grid{ grid-template-columns:1fr; } }
+  .studio-grid h3{
+    font-family:system-ui,-apple-system,sans-serif; font-size:0.78rem;
+    letter-spacing:0.12em; text-transform:uppercase; color:var(--text-dim); margin:0 0 16px;
+  }
+  .spec-list{ list-style:none; margin:0; padding:0; }
+  .spec-list li{ display:flex; justify-content:space-between; gap:16px; padding:11px 0; border-bottom:1px solid var(--line); font-size:0.98rem; }
+  .spec-list li span:first-child{ color:var(--text-dim); font-family:system-ui,-apple-system,sans-serif; font-size:0.86rem; }
+
+  /* About */
+  .about p{ font-size:1.08rem; max-width:64ch; color:var(--text); }
+  .about p.dim{ color:var(--text-dim); }
+
+  /* Contact */
+  form{ display:grid; gap:18px; max-width:560px; }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  @media (max-width:520px){ .row2{ grid-template-columns:1fr; } }
+  label{
+    font-family:system-ui,-apple-system,sans-serif; font-size:0.78rem;
+    letter-spacing:0.08em; text-transform:uppercase; color:var(--text-dim);
+    display:block; margin-bottom:8px;
+  }
+  input, textarea{
+    width:100%; background:var(--bg-raised); border:1px solid var(--line); color:var(--text);
+    padding:12px 14px; font-family:inherit; font-size:1rem; border-radius:2px;
+  }
+  input:focus, textarea:focus{ border-color:var(--accent); }
+  textarea{ resize:vertical; min-height:120px; }
+  .form-note{ font-family:system-ui,-apple-system,sans-serif; font-size:0.8rem; color:var(--text-dim); margin-top:-6px; }
+  .contact-alt{ margin-top:28px; color:var(--text-dim); }
+
+  footer{ padding:36px 0; text-align:center; color:var(--text-dim); font-size:0.85rem; font-family:system-ui,-apple-system,sans-serif; }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+    <div class="brand"><span class="mark"></span> Scott Hilsee</div>
+    <button class="navtoggle" aria-label="Toggle menu" aria-expanded="false" id="navToggle">☰</button>
+    <div class="navlinks" id="navLinks">
+      <a href="#demos">Demos</a>
+      <a href="#services">Services</a>
+      <a href="#studio">Studio</a>
+      <a href="#about">About</a>
+      <a href="#contact">Get a Quote</a>
+    </div>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="hero-eyebrow">Voiceover Artist</p>
+    <h1>Clear, <em>authentic</em> narration for work that has to land.</h1>
+    <p>Documentary, explainer, industrial, medical, and PSA voiceover — recorded broadcast-quality, delivered fast, direction included.</p>
+    <div class="hero-cta">
+      <a href="#demos" class="btn btn-solid">Listen to Demos</a>
+      <a href="#contact" class="btn btn-ghost">Request a Quote</a>
+    </div>
+    <div class="wave" aria-hidden="true">
+      <span style="height:40%;animation-delay:0s"></span>
+      <span style="height:70%;animation-delay:0.15s"></span>
+      <span style="height:55%;animation-delay:0.3s"></span>
+      <span style="height:90%;animation-delay:0.45s"></span>
+      <span style="height:35%;animation-delay:0.6s"></span>
+      <span style="height:65%;animation-delay:0.75s"></span>
+      <span style="height:50%;animation-delay:0.9s"></span>
+      <span style="height:80%;animation-delay:1.05s"></span>
+      <span style="height:45%;animation-delay:1.2s"></span>
+      <span style="height:60%;animation-delay:1.35s"></span>
+    </div>
+  </div>
+</section>
+
+<section id="demos">
+  <div class="wrap">
+    <p class="section-label">Listen</p>
+    <h2>Featured Demos</h2>
+    <div class="demo-grid">
+      <div class="demo">
+        <div>
+          <div class="demo-name">Documentary</div>
+          <div class="demo-tag">Long-form narration</div>
+        </div>
+        <audio controls preload="none" src="assets/audio/Documentary.mp3">Your browser does not support the audio element.</audio>
+      </div>
+      <div class="demo">
+        <div>
+          <div class="demo-name">Explainer</div>
+          <div class="demo-tag">Corporate / product</div>
+        </div>
+        <audio controls preload="none" src="assets/audio/Explainer.mp3">Your browser does not support the audio element.</audio>
+      </div>
+      <div class="demo">
+        <div>
+          <div class="demo-name">Industrial &amp; Promo</div>
+          <div class="demo-tag">Corporate / training</div>
+        </div>
+        <audio controls preload="none" src="assets/audio/Industrial_Promo.mp3">Your browser does not support the audio element.</audio>
+      </div>
+      <div class="demo">
+        <div>
+          <div class="demo-name">Medical</div>
+          <div class="demo-tag">Healthcare / eLearning</div>
+        </div>
+        <audio controls preload="none" src="assets/audio/Medical.mp3">Your browser does not support the audio element.</audio>
+      </div>
+      <div class="demo">
+        <div>
+          <div class="demo-name">Teen Driving</div>
+          <div class="demo-tag">PSA / safety campaign</div>
+        </div>
+        <audio controls preload="none" src="assets/audio/Teen_Driving.mp3">Your browser does not support the audio element.</audio>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="services">
+  <div class="wrap">
+    <p class="section-label">What I Record</p>
+    <h2>Services</h2>
+    <ul class="services">
+      <li>Documentary &amp; long-form narration</li>
+      <li>Corporate &amp; explainer videos</li>
+      <li>Industrial &amp; training content</li>
+      <li>Medical &amp; healthcare eLearning</li>
+      <li>PSAs &amp; safety campaigns</li>
+      <li>IVR, telephony &amp; on-hold messaging</li>
+      <li>Live direction<span class="note">Source-Connect Standard / Zoom</span></li>
+      <li>Turnaround<span class="note">24–48 hr standard</span></li>
+    </ul>
+  </div>
+</section>
+
+<section id="studio">
+  <div class="wrap">
+    <p class="section-label">The Setup</p>
+    <h2>Studio Specs</h2>
+    <div class="studio-grid">
+      <div>
+        <h3>Recording Chain</h3>
+        <ul class="spec-list">
+          <li><span>Mic</span><span>Sennheiser MKH 416</span></li>
+          <li><span>Preamp</span><span>Stellar X2</span></li>
+          <li><span>Interface</span><span>Focusrite Scarlett 2i2</span></li>
+          <li><span>Interface</span><span>SSL 2 MKII</span></li>
+          <li><span>DAW</span><span>Reaper</span></li>
+          <li><span>Delivery</span><span>WAV / AIFF / MP3, 44.1–96 kHz, 16–24 bit</span></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Quality</h3>
+        <ul class="spec-list">
+          <li><span>Booth</span><span>Broadcast-quality, noise-treated</span></li>
+          <li><span>Direction</span><span>Live via Source-Connect / Zoom</span></li>
+          <li><span>Mastering</span><span>Basic mastering on request</span></li>
+          <li><span>Licensing</span><span>Usage-based, available on request</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap about">
+    <p class="section-label">Who's Behind the Mic</p>
+    <h2>About Scott</h2>
+    <p>I provide clean, confident voiceover with quick turnaround for agencies, brands, and production teams. From documentary narration to medical eLearning to PSA campaigns, I focus on performances that fit the story and the deadline.</p>
+    <p class="dim">Need a test read? Send a short script and direction, and I'll record a no-obligation custom audition.</p>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <p class="section-label">Start a Project</p>
+    <h2>Get a Quote</h2>
+    <form id="quoteForm" action="https://formspree.io/f/xyegpwjo" method="POST">
+      <div class="row2">
+        <div>
+          <label for="name">Full name</label>
+          <input type="text" id="name" name="name" required>
+        </div>
+        <div>
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+      </div>
+      <div>
+        <label for="details">Project details</label>
+        <textarea id="details" name="details" required></textarea>
+      </div>
+      <div class="row2">
+        <div>
+          <label for="budget">Budget (optional)</label>
+          <input type="text" id="budget" name="budget">
+        </div>
+        <div>
+          <label for="deadline">Deadline (optional)</label>
+          <input type="text" id="deadline" name="deadline">
+        </div>
+      </div>
+      <div>
+        <button type="submit" class="btn btn-solid" style="border:none;cursor:pointer;">Send Request</button>
+        <p class="form-note">Form delivery via Formspree — replace <code>YOUR_FORM_ID</code> above with your own after creating a free account at formspree.io.</p>
+      </div>
+    </form>
+    <p class="contact-alt">Prefer email? <a href="#" id="emailLink">Click to reveal address</a></p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">&copy; <span id="year"></span> Scott Hilsee. All rights reserved.</div>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // simple obfuscated mailto to cut down on scraper spam
+  (function(){
+    var u = "scott.hilsee", d = "gmail.com";
+    var link = document.getElementById('emailLink');
+    link.addEventListener('click', function(e){
+      e.preventDefault();
+      var addr = u + "@" + d;
+      link.textContent = addr;
+      link.href = "mailto:" + addr;
+    }, { once:true });
+  })();
+
+  // mobile nav toggle
+  (function(){
+    var btn = document.getElementById('navToggle');
+    var nav = document.getElementById('navLinks');
+    btn.addEventListener('click', function(){
+      var open = nav.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    nav.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click', function(){ nav.classList.remove('open'); });
+    });
+  })();
+</script>
+
+</body>
+</html>
